@@ -20,11 +20,14 @@ struct HomepageView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding()
                     .background(Color(.systemBackground))
+                    .accessibilityIdentifier("homepage.title")
                 
                 switch viewModel.state {
                 case .loading:
                     Spacer()
                     ProgressView()
+                        .accessibilityLabel("Loading places")
+                        .accessibilityIdentifier("homepage.loading")
                     Spacer()
                     
                 case .success(let locations):
@@ -55,11 +58,14 @@ struct HomepageView: View {
                                 }
                                 .padding(.vertical, 4)
                                 .contentShape(Rectangle())
+                                .accessibilityLabel(locationAccessibilityLabel(for: location))
                             }
                             .buttonStyle(.plain)
+                            .accessibilityIdentifier("homepage.location.\(location.id)")
                         }
                     }
                     .listStyle(.plain)
+                    .accessibilityIdentifier("homepage.locations.list")
                     
                 case .failure(let error):
                     Spacer()
@@ -75,6 +81,7 @@ struct HomepageView: View {
                                 await viewModel.fetchPlaces()
                             }
                         }
+                        .accessibilityIdentifier("homepage.retry")
                     }
                     .padding()
                     Spacer()
@@ -88,6 +95,8 @@ struct HomepageView: View {
                         Image(systemName: "plus")
                             .font(.title3)
                     }
+                    .accessibilityLabel("Add custom location")
+                    .accessibilityIdentifier("homepage.addCustomLocation")
                 }
             }
             .sheet(isPresented: $showingCustomLocation) {
@@ -99,6 +108,14 @@ struct HomepageView: View {
                 }
             }
         }
+    }
+    
+    private func locationAccessibilityLabel(for location: Location) -> String {
+        if let lat = location.lat, let long = location.long {
+            return "\(location.displayName). Latitude \(String(format: "%.4f", lat)), Longitude \(String(format: "%.4f", long))"
+        }
+        
+        return location.displayName
     }
 }
 

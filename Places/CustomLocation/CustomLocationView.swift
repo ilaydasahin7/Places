@@ -22,6 +22,8 @@ struct CustomLocationView: View {
                         TextField("e.g., 52.3676", text: $viewModel.latitudeText)
                             .keyboardType(.decimalPad)
                             .textFieldStyle(.roundedBorder)
+                            .accessibilityLabel("Latitude")
+                            .accessibilityIdentifier("customLocation.latitude")
                     }
                     
                     VStack(alignment: .leading, spacing: 8) {
@@ -31,6 +33,8 @@ struct CustomLocationView: View {
                         TextField("e.g., 4.9041", text: $viewModel.longitudeText)
                             .keyboardType(.decimalPad)
                             .textFieldStyle(.roundedBorder)
+                            .accessibilityLabel("Longitude")
+                            .accessibilityIdentifier("customLocation.longitude")
                     }
                 } header: {
                     Text("Enter Coordinates")
@@ -54,6 +58,7 @@ struct CustomLocationView: View {
                         }
                     }
                     .disabled(!viewModel.isValid)
+                    .accessibilityIdentifier("customLocation.openWikipedia")
                 }
             }
             .navigationTitle("Custom Location")
@@ -63,6 +68,7 @@ struct CustomLocationView: View {
                     Button("Cancel") {
                         isPresented = false
                     }
+                    .accessibilityIdentifier("customLocation.cancel")
                 }
             }
             .alert("Error", isPresented: Binding(
@@ -70,6 +76,7 @@ struct CustomLocationView: View {
                 set: { if !$0 { viewModel.errorMessage = nil } }
             )) {
                 Button("OK") { }
+                    .accessibilityIdentifier("customLocation.error.ok")
             } message: {
                 Text(viewModel.errorMessage ?? "An unknown error occurred.")
             }
