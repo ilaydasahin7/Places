@@ -21,26 +21,33 @@ struct HomepageView: View {
             
             List {
                 ForEach(viewModel.locations) { location in
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(location.displayName)
-                            .font(.headline)
-                        
-                        if let lat = location.lat, let long = location.long {
-                            HStack {
-                                Text("Lat: \(lat, specifier: "%.4f")")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                                
-                                Text("•")
-                                    .foregroundColor(.secondary)
-                                
-                                Text("Long: \(long, specifier: "%.4f")")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
+                    Button(action: {
+                        viewModel.openInWikipedia(location: location)
+                    }) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(location.displayName)
+                                .font(.headline)
+                                .foregroundColor(.primary)
+                            
+                            if let lat = location.lat, let long = location.long {
+                                HStack {
+                                    Text("Lat: \(lat, specifier: "%.4f")")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                    
+                                    Text("•")
+                                        .foregroundColor(.secondary)
+                                    
+                                    Text("Long: \(long, specifier: "%.4f")")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
                             }
                         }
+                        .padding(.vertical, 4)
+                        .contentShape(Rectangle())
                     }
-                    .padding(.vertical, 4)
+                    .buttonStyle(.plain)
                 }
             }
             .listStyle(.plain)
