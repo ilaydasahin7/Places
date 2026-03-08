@@ -21,38 +21,64 @@ struct HomepageView: View {
                     .padding()
                     .background(Color(.systemBackground))
                 
-                List {
-                    ForEach(viewModel.locations) { location in
-                        Button(action: {
-                            viewModel.openInWikipedia(location: location)
-                        }) {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(location.displayName)
-                                    .font(.headline)
-                                    .foregroundColor(.primary)
-                                
-                                if let lat = location.lat, let long = location.long {
-                                    HStack {
-                                        Text("Lat: \(lat, specifier: "%.4f")")
-                                            .font(.caption)
-                                            .foregroundColor(.secondary)
-                                        
-                                        Text("•")
-                                            .foregroundColor(.secondary)
-                                        
-                                        Text("Long: \(long, specifier: "%.4f")")
-                                            .font(.caption)
-                                            .foregroundColor(.secondary)
+                switch viewModel.state {
+                case .loading:
+                    Spacer()
+                    ProgressView()
+                    Spacer()
+                    
+                case .success(let locations):
+                    List {
+                        ForEach(locations) { location in
+                            Button(action: {
+                                viewModel.openInWikipedia(location: location)
+                            }) {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(location.displayName)
+                                        .font(.headline)
+                                        .foregroundColor(.primary)
+                                    
+                                    if let lat = location.lat, let long = location.long {
+                                        HStack {
+                                            Text("Lat: \(lat, specifier: "%.4f")")
+                                                .font(.caption)
+                                                .foregroundColor(.secondary)
+                                            
+                                            Text("•")
+                                                .foregroundColor(.secondary)
+                                            
+                                            Text("Long: \(long, specifier: "%.4f")")
+                                                .font(.caption)
+                                                .foregroundColor(.secondary)
+                                        }
                                     }
                                 }
+                                .padding(.vertical, 4)
+                                .contentShape(Rectangle())
                             }
-                            .padding(.vertical, 4)
-                            .contentShape(Rectangle())
+                            .buttonStyle(.plain)
                         }
-                        .buttonStyle(.plain)
                     }
+                    .listStyle(.plain)
+                    
+                case .failure(let error):
+                    Spacer()
+                    VStack(spacing: 16) {
+                        Text("Error")
+                            .font(.headline)
+                        Text(error)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
+                        Button("Retry") {
+                            Task {
+                                await viewModel.fetchPlaces()
+                            }
+                        }
+                    }
+                    .padding()
+                    Spacer()
                 }
-                .listStyle(.plain)
             }
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -66,6 +92,11 @@ struct HomepageView: View {
             }
             .sheet(isPresented: $showingCustomLocation) {
                 CustomLocationView(isPresented: $showingCustomLocation)
+            }
+            .onAppear {
+                Task {
+                    await viewModel.fetchPlaces()
+                }
             }
         }
     }

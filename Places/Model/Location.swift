@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Location: Identifiable {
+struct Location: Identifiable, Decodable {
     let id = UUID()
     let name: String?
     let lat: Double?
@@ -21,5 +21,11 @@ struct Location: Identifiable {
             return String(format: "%.4f, %.4f", lat, long)
         }
         return "Unknown Location"
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case name
+        case lat
+        case long
     }
 }

@@ -8,16 +8,31 @@
 import Combine
 import SwiftUI
 
+enum HomepageState {
+    case loading
+    case success([Location])
+    case failure(String)
+}
+
+@MainActor
 final class HomepageViewModel: ObservableObject {
-    @Published var locations: [Location] = []
+    @Published var state: HomepageState = .loading
     
-    init() {
-        locations = [
-            Location(name: "Amsterdam", lat: 52.3676, long: 4.9041),
-            Location(name: "Istanbul", lat: 41.0082, long: 28.9784),
-            Location(name: "Mumbai", lat: 19.0760, long: 72.8777),
-            Location(name: nil, lat: 40.4381, long: -3.7496)
-        ]
+    private let locationService: LocationServiceProtocol
+    
+    init(locationService: LocationServiceProtocol = LocationService()) {
+        self.locationService = locationService
+    }
+    
+    func fetchPlaces() async {
+        state = .loading
+        
+        do {
+            let fetchedLocations = try await locationService.fetchLocations()
+            state = .success(fetchedLocations)
+        } catch {
+            state = .failure(error.localizedDescription)
+        }
     }
     
     func openInWikipedia(location: Location) {
