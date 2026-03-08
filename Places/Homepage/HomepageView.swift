@@ -102,8 +102,8 @@ struct HomepageView: View {
             .sheet(isPresented: $showingCustomLocation) {
                 CustomLocationView(isPresented: $showingCustomLocation)
             }
-            .onAppear {
-                Task {
+            .task {
+                if case .loading = viewModel.state {
                     await viewModel.fetchPlaces()
                 }
             }
