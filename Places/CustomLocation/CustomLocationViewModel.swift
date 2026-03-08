@@ -8,6 +8,7 @@
 import Combine
 import SwiftUI
 
+@MainActor
 final class CustomLocationViewModel: ObservableObject {
     @Published var latitudeText: String = ""
     @Published var longitudeText: String = ""
